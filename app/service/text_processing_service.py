@@ -47,21 +47,21 @@ class TextProcessingService:
             FORMATO EXATO:
             {
                 "subject": ["tag1", "tag2", "tag3"],
-                "technical_level": "easy"
+                "technical_level": "iniciante"
             }
 
             REGRAS OBRIGATÓRIAS:
             1. Responda APENAS o JSON, sem texto adicional
             2. Inclua SEMPRE os dois campos: "subject" e "technical_level"
             3. "subject" deve ser uma lista de strings (ex: ["tecnologia", "programacao"])
-            4. "technical_level" deve ser: "easy", "intermediary" ou "hard"
+            4. "technical_level" deve ser: "iniciante", "intermediário" ou "difícil"
             5. Certifique-se de que o JSON está completo e válido
             6. Não corte a resposta no meio
 
             Exemplo de resposta válida:
             {
                 "subject": ["tecnologia", "programacao", "web"],
-                "technical_level": "intermediary"
+                "technical_level": "intermediário"
             }
             """),
             HumanMessage(content=text)
