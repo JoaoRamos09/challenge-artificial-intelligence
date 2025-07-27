@@ -5,6 +5,8 @@ from app.service.ai_service import AIService
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.dto.text_analysis_dto import TextAnalisysDTO
 from app.service.file_service import FileService
+import uuid
+from app.dto.chunk_dto import TypeFile
 class TextProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service
@@ -27,8 +29,15 @@ class TextProcessingService:
         chunks = []
         for text in texts:
             response = self.get_analysis_text(text)
-            text_dto = ChunkDTO(content=text, path= file_name, technical_level=response.technical_level, tags=response.subject, metadata={})
+            text_dto = ChunkDTO(
+                id=str(uuid.uuid4()), 
+                content=text, 
+                path= file_name, 
+                tags=response.subject, 
+                metadata={"technical_level": response.technical_level},
+                type_file=TypeFile.TEXT)
             chunks.append(text_dto)
+            
         return chunks
     
     def get_analysis_text(self, text):

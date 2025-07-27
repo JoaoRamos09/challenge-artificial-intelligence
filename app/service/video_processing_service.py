@@ -2,10 +2,12 @@ from app.service.ai_service import AIService
 from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.dto.video_analysis_dto import VideoAnalysisDTO
-from app.dto.chunk_dto import ChunkDTO
+from app.dto.chunk_dto import ChunkDTO, TypeFile
 from app.service.text_processing_service import TextProcessingService
 from app.service.file_service import FileService
 from typing import List
+import uuid
+
 class VideoProcessingService():
     def __init__(self, ai_service: AIService, text_processing_service: TextProcessingService, file_service: FileService):
         self.ai_service = ai_service
@@ -24,14 +26,21 @@ class VideoProcessingService():
         chunks = []
         for chunk in split_transcription:
             analysis = self.get_analysis_video(chunk)
-            chunk_dto = ChunkDTO(content=chunk, path=path, technical_level="", tags=analysis.tags, metadata=self.format_metadata_dict(analysis.summary, analysis.subject))
+            chunk_dto = ChunkDTO(
+                id=str(uuid.uuid4()), 
+                content=chunk, 
+                type_file=TypeFile.VIDEO,
+                path=path, 
+                tags=analysis.tags, 
+                metadata=self.format_metadata_dict(analysis.summary, analysis.subject, analysis.technical_level))
             chunks.append(chunk_dto)
         return chunks
     
-    def format_metadata_dict(self, summary:str, subject:List[str]):
+    def format_metadata_dict(self, summary:str, subject:List[str], technical_level:str):
         return {
             "summary": summary if summary is not None else "",
             "subject": subject if subject is not None else [],
+            "technical_level": technical_level if technical_level is not None else "easy"
         }
     
     def get_analysis_video(self,transcription:str):
@@ -44,6 +53,7 @@ class VideoProcessingService():
                           {
                               "summary": "Resumo da transcrição",
                               "subject": "Assunto da transcrição",
+                              "tags": "Palavras chaves da transcrição",
                               "technical_level": "Nível técnico da transcrição"
                           }
                           
@@ -52,9 +62,10 @@ class VideoProcessingService():
                           2. Inclua SEMPRE os três campos: "summary", "subject" e "technical_level"
                           3. "subject" deve ser uma lista de strings com os assuntos principais do vídeo (ex: ["tecnologia", "programacao"])
                           4. "tags" deve ser uma lista de strings com as palavras chaves do vídeo (ex: ["tecnologia", "programacao"])
-                          5. "summary" deve ser um resumo do vídeo com no máximo
-                          5. Certifique-se de que o JSON está completo e válido
-                          6. Não corte a resposta no meio
+                          5. "summary" deve ser um resumo do vídeo com no máximo 1000 caracteres
+                          6. "technical_level" deve ser um nível técnico do vídeo (ex: "iniciante", "intermediário", "difícil")
+                          7. Certifique-se de que o JSON está completo e válido
+                          8. Não corte a resposta no meio
                           """),
             HumanMessage(content=transcription)
         ]

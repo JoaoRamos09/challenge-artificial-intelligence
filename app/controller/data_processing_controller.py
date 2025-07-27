@@ -4,6 +4,7 @@ from app.service.image_processing_service import ImageProcessingService
 from app.service.video_processing_service import VideoProcessingService
 from app.service.ai_service import AIService
 from app.service.file_service import FileService
+from app.service.indexing_service import IndexingService
 processing_data_router = APIRouter(prefix="/data-processing", tags=["process-data"])
 
 def get_ai_service():
@@ -11,6 +12,9 @@ def get_ai_service():
 
 def get_file_service():
     return FileService()
+
+def get_indexing_service():
+    return IndexingService()
 
 def get_text_processing_service(ai_service: AIService = Depends(get_ai_service), file_service: FileService = Depends(get_file_service)):
     return TextProcessingService(ai_service, file_service)
@@ -22,8 +26,9 @@ def get_video_processing_service(ai_service: AIService = Depends(get_ai_service)
     return VideoProcessingService(ai_service, text_processing_service, file_service)
 
 @processing_data_router.post("/text")
-def process_text(path: str, text_processing_service: TextProcessingService = Depends(get_text_processing_service)):
+def process_text(path: str, text_processing_service: TextProcessingService = Depends(get_text_processing_service), indexing_service: IndexingService = Depends(get_indexing_service)):
     text = text_processing_service.process_text(file_name=path)
+    indexing_service.save_data(text)
     return text
 
 @processing_data_router.post("/image")
