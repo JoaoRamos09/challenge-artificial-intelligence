@@ -15,7 +15,7 @@ class FileService():
             raise FileNotFound(path)
         
         if not file_path.is_file():
-            raise InvalidTypeFileError(path, "file")
+            raise InvalidTypeFileError(path)
         
         if not file_path.suffix in allowed_formats:
             raise InvalidSuffixFileError(path, allowed_formats)
