@@ -3,3 +3,4 @@ fastapi
 uvicorn
 langchain_core
 langchain_groq
+openai
