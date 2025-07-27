@@ -1,18 +1,17 @@
 from app.service.ai_service import AIService
-from pathlib import Path
 from app.dto.chunk_dto import ChunkDTO
 from app.dto.image_analysis_dto import ImageAnalysisDTO
 from langchain_core.messages import HumanMessage, SystemMessage
-import base64
+from app.service.file_service import FileService
 
 class ImageProcessingService:
-    def __init__(self, ai_service: AIService):
+    def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service
+        self.file_service = file_service
         pass
     
     def process_image(self,path:str):
-        self.file_exists(path)
-        image_base_url = self.encode_image(path=path)
+        image_base_url = self.file_service.get_file_image_from_path(path)
         response = self.get_analysis_image(image_base_url)
         return ChunkDTO(content=response.description, 
                         path=path, technical_level="",
@@ -22,31 +21,12 @@ class ImageProcessingService:
             colors = response.colors, 
             objects = response.objects))
     
-    def encode_image(self, path:str):
-        try:
-            with open(path, "rb") as img_file:
-                base64_image = base64.b64encode(img_file.read()).decode("utf-8")
-                return base64_image
-        ##TODO: Add custom exception    
-        except Exception as e:
-            raise Exception(f"Erro ao codificar a imagem em base64: {e}")
-    
     def format_metadata_dict(self, texts: str, colors: list, objects: list):
         return {
             "texts": texts if texts is not None else "",
             "colors": colors if colors is not None else [],
             "objects": objects if objects is not None else []
-        }
-        
-    ##TODO: Add service file
-    def file_exists(self, path:str):
-        file_path = Path(path)
-        
-        if not file_path.exists():
-            raise FileNotFoundError
-        
-        if not file_path.is_file():
-            raise ValueError   
+        } 
     
     def get_analysis_image(self,base64_image):
         messages = [
