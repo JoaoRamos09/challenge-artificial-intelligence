@@ -3,6 +3,8 @@ from app.dto.chunk_dto import ChunkDTO
 from app.dto.image_analysis_dto import ImageAnalysisDTO
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.service.file_service import FileService
+import uuid
+from app.dto.chunk_dto import TypeFile
 
 class ImageProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
@@ -13,13 +15,16 @@ class ImageProcessingService:
     def process_image(self,path:str):
         image_base_url = self.file_service.get_file_image_from_path(path)
         response = self.get_analysis_image(image_base_url)
-        return ChunkDTO(content=response.description, 
-                        path=path, technical_level="",
-                        tags=response.tags, 
-                        metadata=self.format_metadata_dict(
-            texts = response.texts,
-            colors = response.colors, 
-            objects = response.objects))
+        return ChunkDTO(
+            id=str(uuid.uuid4()),
+            content=response.description, 
+            path=path, 
+            tags=response.tags, 
+            type_file=TypeFile.IMAGE,
+            metadata=self.format_metadata_dict(
+                texts = response.texts,
+                colors = response.colors, 
+                objects = response.objects))
     
     def format_metadata_dict(self, texts: str, colors: list, objects: list):
         return {
