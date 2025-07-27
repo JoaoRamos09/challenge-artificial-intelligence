@@ -6,7 +6,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from app.dto.text_analysis_dto import TextAnalisysDTO
 from app.service.file_service import FileService
 import uuid
-from app.dto.chunk_dto import TypeFile
+from app.enum.type_file_enum import TypeFileEnum
 class TextProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service
@@ -34,7 +34,7 @@ class TextProcessingService:
                 path= file_name, 
                 tags=response.subject, 
                 metadata={"technical_level": response.technical_level},
-                type_file=TypeFile.TEXT)
+                type_file=TypeFileEnum.TEXT)
             chunks.append(text_dto)
             
         return chunks

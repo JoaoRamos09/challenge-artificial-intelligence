@@ -1,11 +1,5 @@
 from pydantic import BaseModel
-from enum import Enum
-
-class TypeFile(Enum):
-    IMAGE = "image"
-    TEXT = "text"
-    VIDEO = "video"
-    PDF = "pdf"
+from app.enum.type_file_enum import TypeFileEnum
     
 class ChunkDTO(BaseModel):
     id: str
@@ -13,4 +7,4 @@ class ChunkDTO(BaseModel):
     path: str
     tags: list[str]
     metadata: dict
-    type_file: TypeFile
+    type_file: TypeFileEnum
