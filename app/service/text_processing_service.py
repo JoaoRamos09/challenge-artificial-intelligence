@@ -4,28 +4,18 @@ from app.dto.chunk_dto import ChunkDTO
 from app.service.ai_service import AIService
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.dto.text_analysis_dto import TextAnalisysDTO
-
+from app.service.file_service import FileService
 class TextProcessingService:
-    def __init__(self, ai_service: AIService):
+    def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service
+        self.file_service = file_service
         pass
 
     def process_text(self, file_name: str):
-        try:
-            text = self.get_text_from_path(file_name)
-            split_texts = self.split_text(text)
-            chunks = self.texts_to_chunks(texts=split_texts,file_name=file_name)
-            return chunks
-        except FileNotFoundError as e:
-            raise e
-        except Exception as e:
-            raise e
-        
-    def get_text_from_path(self, file_name: str):
-        ##TODO: Add exists_path
-        file_path = Path(file_name)
-        with open(file_path, "r") as file:
-            return file.read()
+        text = self.file_service.get_file_text_from_path(file_name)
+        split_texts = self.split_text(text)
+        chunks = self.texts_to_chunks(texts=split_texts,file_name=file_name)
+        return chunks
     
     
     def split_text(self, text: str):
