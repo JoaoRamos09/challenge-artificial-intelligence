@@ -48,6 +48,10 @@ class FileService():
         except Exception as e:
             raise FileException(message="Error in get video from path", file_path=path)
     
+    def get_pdf_from_path(self, path:str):
+        valid_file = self.valid_file(path, [".pdf"])
+        return valid_file
+    
     
     
     

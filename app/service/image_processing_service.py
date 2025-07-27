@@ -15,7 +15,7 @@ class ImageProcessingService:
     def process_image(self,path:str):
         image_base_url = self.file_service.get_file_image_from_path(path)
         response = self.get_analysis_image(image_base_url)
-        return ChunkDTO(
+        return [ChunkDTO(
             id=str(uuid.uuid4()),
             content=response.description, 
             path=path, 
@@ -24,7 +24,7 @@ class ImageProcessingService:
             metadata=self.format_metadata_dict(
                 texts = response.texts,
                 colors = response.colors, 
-                objects = response.objects))
+                objects = response.objects))]
     
     def format_metadata_dict(self, texts: str, colors: list, objects: list):
         return {
