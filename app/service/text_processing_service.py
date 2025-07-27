@@ -20,9 +20,8 @@ class TextProcessingService:
         return chunks
     
     
-    def split_text(self, text: str):
-        text.split()
-        splitter = RecursiveCharacterTextSplitter(chunk_size=450, chunk_overlap=50)
+    def split_text(self, text: str, chunk_size:int=450, chunk_overlap:int=50):
+        splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         return splitter.split_text(text)
     
     def texts_to_chunks(self, texts:list, file_name:str):

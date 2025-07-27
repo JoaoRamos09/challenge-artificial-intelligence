@@ -9,6 +9,7 @@ from app.database.pinecone import get_index
 class IndexingService:
     def __init__(self):
         self.index = get_index()
+        self.index_name = os.environ.get("PINECONE_INDEX_NAME")
         self.namespace = os.environ.get("PINECONE_NAMESPACE")
 
     def save_data(self, chunks:list[ChunkDTO]):
@@ -17,7 +18,7 @@ class IndexingService:
             self.index.upsert_records(self.namespace,formatted_data)
         except Exception as e:
             print(e)
-            raise PineconeUpsertError(self.namespace, self.index.name)
+            raise PineconeUpsertError(self.namespace, self.index_name)
     
     def format_data_dict(self, chunk:ChunkDTO):
         data_dict = {
