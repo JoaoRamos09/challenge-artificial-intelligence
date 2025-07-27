@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Literal
 
 class ImageAnalysisDTO(BaseModel):
     description: str = Field(description="Descrição detalhada e abrangente do conteúdo visual da imagem, incluindo contexto, cenário e possíveis interpretações.")
@@ -7,3 +7,6 @@ class ImageAnalysisDTO(BaseModel):
     tags: List[str] = Field(description="Lista de palavras-chave ou categorias relevantes que representam os principais temas, assuntos ou elementos da imagem.")
     colors: List[str] = Field(description="Principais cores predominantes na imagem, descritas por nome ou código hexadecimal.")
     objects: List[str] = Field(description="Lista dos objetos, elementos visuais ou entidades reconhecíveis identificados na imagem.")
+    technical_level: Literal["iniciante", "intemediário", "difícil"] = Field(
+        description="Nível técnico do texto: 'iniciante' (fácil), 'intemediário' (intermediário) ou 'difícil' (difícil)."
+    )

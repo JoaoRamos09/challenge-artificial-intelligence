@@ -24,13 +24,17 @@ class ImageProcessingService:
             metadata=self.format_metadata_dict(
                 texts = response.texts,
                 colors = response.colors, 
-                objects = response.objects))]
+                objects = response.objects,
+                technical_level = response.technical_level
+            )
+        )]
     
-    def format_metadata_dict(self, texts: str, colors: list, objects: list):
+    def format_metadata_dict(self, texts: str, colors: list, objects: list, technical_level: str):
         return {
             "texts": texts if texts is not None else "",
             "colors": colors if colors is not None else [],
-            "objects": objects if objects is not None else []
+            "objects": objects if objects is not None else [],
+            "technical_level": technical_level if technical_level is not None else ""
         } 
     
     def get_analysis_image(self,base64_image):
@@ -43,7 +47,8 @@ class ImageProcessingService:
                  - Tags relevantes (ex: tecnologia, natureza, pessoas, etc.)
                  - Cores principais identificadas
                  - Objetos ou elementos visuais presentes
-            
+                 - Nível técnico da imagem: 'iniciante' (fácil), 'intemediário' (intermediário) ou 'difícil' (difícil).
+                 
             Responda sempre no formato JSON especificado.
             """
             ),

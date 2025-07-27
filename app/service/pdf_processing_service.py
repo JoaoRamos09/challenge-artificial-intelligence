@@ -14,6 +14,7 @@ class PDFProcessingService:
         self.text_processing_service = text_processing_service
         self.ai_service = ai_service
 
+    ##TODO: Add custom exception
     def process_pdf(self, path: str):
         file_path = self.file_service.get_pdf_from_path(path)
         pdf = self.read_pdf(file_path)
@@ -59,7 +60,7 @@ class PDFProcessingService:
                  - Descrição detalhada do conteúdo do trecho
                  - Tags relevantes (ex: tecnologia, natureza, pessoas, etc.
                  - Assunto do trecho
-                 - Nível técnico do trecho
+                 - Nível técnico do trecho: 'iniciante' (fácil), 'intemediário' (intermediário) ou 'difícil' (difícil).
             
             Responda sempre no formato JSON especificado.
             """

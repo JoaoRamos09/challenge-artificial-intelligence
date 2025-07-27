@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from app.exception.file_exception import FileNotFound, InvalidTypeFileError, InvalidSuffixFileError, FileException
 import base64
-
+import json
 class FileService():
     def __init__(self):
         pass
@@ -52,6 +52,12 @@ class FileService():
         valid_file = self.valid_file(path, [".pdf"])
         return valid_file
     
-    
+    def get_file_json_from_path(self, path:str):
+        valid_file = self.valid_file(path, [".json"])
+        try:
+            with open(valid_file, "r") as file:
+                return json.load(file)
+        except Exception as e:
+            raise FileException(message="Error in get file json from path", file_path=path)
     
     
