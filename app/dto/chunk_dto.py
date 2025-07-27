@@ -5,7 +5,8 @@ class TypeFile(Enum):
     IMAGE = "image"
     TEXT = "text"
     VIDEO = "video"
-
+    PDF = "pdf"
+    
 class ChunkDTO(BaseModel):
     id: str
     content: str
