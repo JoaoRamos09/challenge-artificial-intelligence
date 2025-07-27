@@ -4,7 +4,7 @@ from app.dto.image_analysis_dto import ImageAnalysisDTO
 from langchain_core.messages import HumanMessage, SystemMessage
 from app.service.file_service import FileService
 import uuid
-from app.dto.chunk_dto import TypeFile
+from app.enum.type_file_enum import TypeFileEnum
 
 class ImageProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
@@ -20,7 +20,7 @@ class ImageProcessingService:
             content=response.description, 
             path=path, 
             tags=response.tags, 
-            type_file=TypeFile.IMAGE,
+            type_file=TypeFileEnum.IMAGE,
             metadata=self.format_metadata_dict(
                 texts = response.texts,
                 colors = response.colors, 
