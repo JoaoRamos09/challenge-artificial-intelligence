@@ -37,7 +37,8 @@ class ImageProcessingService:
             "colors": colors if colors is not None else [],
             "objects": objects if objects is not None else []
         }
-    
+        
+    ##TODO: Add service file
     def file_exists(self, path:str):
         file_path = Path(path)
         

@@ -22,6 +22,7 @@ class TextProcessingService:
             raise e
         
     def get_text_from_path(self, file_name: str):
+        ##TODO: Add exists_path
         file_path = Path(file_name)
         with open(file_path, "r") as file:
             return file.read()
