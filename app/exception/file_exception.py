@@ -1,5 +1,6 @@
 from typing import Optional, Dict, Any
 from fastapi import status
+from app.exception.base_exception import BaseException
 
 
 class FileException(BaseException):
@@ -30,13 +31,22 @@ class FileNotFound(FileException):
             status_code=status.HTTP_404_NOT_FOUND
         )
 
-class InvalidTypeError(FileException):
+class InvalidTypeFileError(FileException):
     
-    def __init__(self, file_path: str, expected_type: str):
+    def __init__(self, file_path: str):
         super().__init__(
-            message=f"Invalid type: expected {expected_type}",
+            message=f"Not a valid file",
             file_path=file_path,
             error_code="INVALID_TYPE_FILE_ERROR",
+        )
+
+class InvalidSuffixFileError(FileException):
+    
+    def __init__(self, file_path: str, expected_suffix: list[str]):
+        super().__init__(
+            message=f"Sufix not allowed: {', '.join(expected_suffix)}",
+            file_path=file_path,
+            error_code="INVALID_SUFFIX_FILE_ERROR",
         )
         
         
