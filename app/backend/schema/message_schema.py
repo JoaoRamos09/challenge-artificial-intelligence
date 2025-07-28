@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Enum
+from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey, Enum
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.backend.enum.type_message_enum import TypeMessageEnum
 from app.backend.enum.type_content_enum import TypeContentEnum
@@ -7,9 +8,10 @@ from app.backend.database.base import Base
 class MessageSchema(Base):
     __tablename__ = "messages"
     
-    id = Column(String, primary_key=True)
-    conversation_id = Column(String, ForeignKey("conversations.id"))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id"))
     content = Column(Text, nullable=False)
     type_content = Column(Enum(TypeContentEnum), nullable=False)
     type_message = Column(Enum(TypeMessageEnum), nullable=False)
     created_at = Column(DateTime, default=datetime.now())
+    conversation = relationship("ConversationSchema", back_populates="messages")
