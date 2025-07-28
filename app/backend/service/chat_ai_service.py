@@ -3,6 +3,7 @@ from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
 from app.backend.state.chat_ai_state import ChatAIState
 from app.backend.service.ai_service import AIService
 from langgraph.graph import StateGraph, END
+from app.backend.dto.extract_data_dto import ExtractDataDTO
 from app.backend.dto.preferences_dto import PreferenceDTO
 from typing import Optional
 class ChatAIService():
@@ -72,36 +73,27 @@ class ChatAIService():
     
     def extract_prefereces_user(self, state: ChatAIState) -> ChatAIState:
         
-        if state["preferences_user"]:
+        if state["extract_data"]:
             return state
         
         system_message = SystemMessage(content="""
                           Você é um assistente de IA especializado em extrair preferências e características do usuário a partir do histórico de mensagens trocadas com ele.
 
-                          Sua tarefa é NÃO RESPONDER à solicitação do usuário neste momento. Em vez disso, analise todo o histórico de mensagens e verifique se estão presentes as seguintes informações:
-
-                          - Nível Técnico do usuário em programação.
-                          - Formato de conteúdo preferido pelo usuário.
-                          - Descrição do perfil do usuário (ex: programador, estudante, profissional de TI), seu contexto, como interage e o tipo de perguntas que faz.
+                         Sua tarefa é realizar perguntas para o usuário para conseguir extrair as seguintes informaçõe:
+                          - O nível técnico do usuário.
+                          - O formato de conteúdo preferido pelo usuário ( texto, vídeo, imagem)
+                          - Descrição do perfil do usuário (ex: programador, estudante, profissional de TI);
                           - Pontos fortes técnicos do usuário.
                           - Pontos fracos técnicos do usuário.
-                          - Assunto ou tema principal que o usuário tem interesse em saber mais ou que está precisando de ajuda (por exemplo: qual dúvida, problema ou objetivo ele expressou nas mensagens).
+                          - O assunto que o usuário está tentando resolver ou dúvida que ele está tentando resolver, ou o tema que ele está tentando aprender. Pergunte a ele caso não esteja claro.
 
                           **Instruções Importantes:**
-                          - NÃO RESPONDA à solicitação do usuário.
-                          - NÃO forneça nenhuma informação extraída ou análise ao usuário.
-                          - Se faltar qualquer uma das informações acima, pergunte SOMENTE as informações que estão faltando, de forma direta, clara, educada e objetiva.
-                          - NÃO explique ao usuário o motivo da pergunta, apenas faça a pergunta necessária para obter a informação que falta.
-                          - NÃO repita perguntas já respondidas anteriormente no histórico.
-                          - NÃO faça suposições ou inferências sem base explícita nas mensagens do usuário.
-                          - NÃO responda ou comente sobre o perfil, pontos fortes ou fracos do usuário para ele.
-                          - Seja cordial, respeitoso e objetivo ao perguntar.
-                          - Não informe ao usuário os tipos de dado que você aceita, apenas pergunte o que precisa saber. Por exemplo: "Qual o seu nível técnico?" em vez de listar opções.
-                          - ATENÇÃO: Mensagens genéricas como "Olá", "Tudo bem?", "O que houve?" e outras saudações ou cumprimentos similares PODEM SER ACEITAS e NÃO DEVEM ser consideradas como ausência de informação relevante. Ou seja, a presença dessas mensagens no histórico é normal e não significa que está faltando informação do perfil do usuário. Considere isso de forma clara e explícita na sua análise.
-
-                          Além disso, explique ao usuário, de forma breve e cordial, que você está aqui para ajudá-lo com dúvidas e perguntas sobre programação e, para isso, precisa entender melhor o perfil dele para conseguir entregar um conteúdo adaptativo e personalizado.
-
-                          **Resumindo:** NÃO RESPONDA à solicitação do usuário. Apenas pergunte ao usuário, de forma direta e educada, as informações que ainda estão faltando para completar o perfil solicitado acima, e explique que isso é importante para que você possa ajudá-lo melhor com dúvidas e perguntas sobre programação.
+                          - Você não deve responder a solicitação/pergunta do usuário;
+                          - Você deve informar e realizar perguntas visando fazer o usuário fornecer as informações que faltam para completar o perfil solicitado acima.
+                          - Quando você entender que já tem todas as informações necessárias, informe ao usuário que será preparado um conteúdo educativo baseado nas preferências, nível tecnico e tipo de conteúdo que ele está tentando aprender.
+                          - O mais importante e primeira coisa a se fazer é perguntar qual o assunto ou dúvida que o usuário está tentando resolver, ou seja, em qual assunto vamos ajudar ele.
+                          
+                          Seja educado e simpático com o usuário.
                           """
         )
         messages = [
@@ -154,21 +146,21 @@ class ChatAIService():
                   - Descrição do Usuário: Descrição do usuário, se ele é um programador, um estudante, um profissional de TI, etc. Como ele interage, quais tipos de perguntas ele faz, etc.
                   - Quais são so seus pontos fortes técnicos;
                   - Quais são so seus pontos fracos técnicos;
+                  - Qual a pergunta do usuário ou dúvida que ele está tentando resolver;
                   
                   IMPORTANTE: Use os valores exatos dos enums (JUNIOR, MID_LEVEL, SENIOR para level_technical e TEXT, VIDEO, IMAGE para preference_content)
                   """),
             *state["messages"]
         ]
-        response = self.ai_service.invoke_llm(messages_preferences_user, model="gpt-4o-mini",provider="openai", output_structured=PreferenceDTO)
-        preferences_user = PreferenceDTO(**response.model_dump())
-        state["preferences_user"] = preferences_user
+        response = self.ai_service.invoke_llm(messages_preferences_user, model="gpt-4o-mini",provider="openai", output_structured=ExtractDataDTO)
+        extract_data = ExtractDataDTO(**response.model_dump())
+        state["extract_data"] = extract_data
         state["insufficent_information"] = False
         return state
     
     def generate_answer_node(self, state: ChatAIState) -> ChatAIState:
         
-        messages = state["messages"].copy()
-        messages.pop()
+        state["messages"].pop()
         
         messages_question_user = [
             SystemMessage(content="""
@@ -220,14 +212,15 @@ class ChatAIService():
             HumanMessage(content=
                          f"""
                          Me ajude a responder a seguinte pergunta: {question_user}
+                         O tema que eu quero aprender é: {state["extract_data"].question}
                          
                          Leve em consideração as minhas preferências:
                          
-                         Nível Técnico: {state["preferences_user"].level_technical}
-                         Formato de Conteúdo: {state["preferences_user"].preference_content}
-                         Descrição do Usuário: {state["preferences_user"].description}
-                         Pontos Fortes: {state["preferences_user"].strengths}
-                         Pontos Fracos: {state["preferences_user"].weaknesses}
+                         Nível Técnico: {state["extract_data"].level_technical}
+                         Formato de Conteúdo: {state["extract_data"].preference_content}
+                         Descrição do Usuário: {state["extract_data"].description}
+                         Pontos Fortes: {state["extract_data"].strengths}
+                         Pontos Fracos: {state["extract_data"].weaknesses}
                          
                          """),
         ]
@@ -253,9 +246,18 @@ class ChatAIService():
     def invoke_graph_chat_ai(self, messages: list[BaseMessage], preferences_user: Optional[PreferenceDTO] = None):
         graph = self.graph_chat_ai()
         try:
-            response = graph.invoke({"messages": messages, "preferences_user": preferences_user})
+            if preferences_user:
+                extract_data = ExtractDataDTO(
+                    level_technical=preferences_user.level_technical,
+                    preference_content=preferences_user.preference_content,
+                    description=preferences_user.description,
+                    weaknesses=preferences_user.weaknesses,
+                    strengths=preferences_user.strengths,
+                )
+                response = graph.invoke({"messages": messages, "extract_data": extract_data})
+            else:
+                response = graph.invoke({"messages": messages, "extract_data": None})
             return response
-        ##TODO: Add custom exception
         except Exception as e:
             raise e
         

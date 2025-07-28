@@ -1,10 +1,9 @@
 from typing import TypedDict
 from langchain_core.messages import BaseMessage
-from app.backend.dto.preferences_dto import PreferenceDTO
+from app.backend.dto.extract_data_dto import ExtractDataDTO
 
 class ChatAIState(TypedDict):
     safety: bool
     insufficent_information: bool
     messages: list[BaseMessage]
-    preferences_user: PreferenceDTO
-    
+    extract_data: ExtractDataDTO
