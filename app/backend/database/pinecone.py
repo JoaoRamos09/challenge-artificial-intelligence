@@ -1,6 +1,6 @@
 from pinecone import Pinecone
 import os
-from app.exception.pinecone_exception import PineconeIndexNotFound
+from app.backend.exception.pinecone_exception import PineconeIndexNotFound
 
 def get_pc():
     return Pinecone(os.getenv("PINECONE_API_KEY"))

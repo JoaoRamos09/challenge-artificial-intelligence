@@ -1,10 +1,10 @@
-from app.service.ai_service import AIService
-from app.dto.chunk_dto import ChunkDTO
-from app.dto.image_analysis_dto import ImageAnalysisDTO
+from app.backend.service.ai_service import AIService
+from app.backend.dto.chunk_dto import ChunkDTO
+from app.backend.dto.image_analysis_dto import ImageAnalysisDTO
 from langchain_core.messages import HumanMessage, SystemMessage
-from app.service.file_service import FileService
+from app.backend.service.file_service import FileService
 import uuid
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
 
 class ImageProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):

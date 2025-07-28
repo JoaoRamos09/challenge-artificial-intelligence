@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, DateTime, Integer, Enum
 from sqlalchemy.orm import relationship
-from app.enum.status_conversation_enum import StatusConversationEnum
+from app.backend.enum.status_conversation_enum import StatusConversationEnum
 from datetime import datetime
-from app.database.base import Base
+from app.backend.database.base import Base
 
 class ConversationSchema(Base):
     __tablename__ = "conversations"

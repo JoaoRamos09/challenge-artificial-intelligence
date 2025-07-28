@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Enum
 from datetime import datetime
-from app.enum.type_message_enum import TypeMessageEnum
-from app.enum.type_content_enum import TypeContentEnum
-from app.database.base import Base
+from app.backend.enum.type_message_enum import TypeMessageEnum
+from app.backend.enum.type_content_enum import TypeContentEnum
+from app.backend.database.base import Base
 
 class MessageSchema(Base):
     __tablename__ = "messages"

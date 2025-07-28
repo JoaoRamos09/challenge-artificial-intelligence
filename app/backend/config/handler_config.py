@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.handler.global_handler import global_exception_handler, handle_validation_exception, handle_generic_exception
-from app.exception.base_exception import BaseException
+from app.backend.handler.global_handler import global_exception_handler, handle_validation_exception, handle_generic_exception
+from app.backend.exception.base_exception import BaseException
 from pydantic import ValidationError
 
 def setup_exception_handlers(app: FastAPI) -> None:

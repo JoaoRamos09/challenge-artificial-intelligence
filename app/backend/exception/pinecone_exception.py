@@ -1,4 +1,4 @@
-from app.exception.base_exception import BaseException
+from app.backend.exception.base_exception import BaseException
 from typing import Optional
 from fastapi import status
 

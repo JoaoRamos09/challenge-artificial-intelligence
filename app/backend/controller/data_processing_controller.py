@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
-from app.service.text_processing_service import TextProcessingService
-from app.service.image_processing_service import ImageProcessingService
-from app.service.video_processing_service import VideoProcessingService
-from app.service.ai_service import AIService
-from app.service.file_service import FileService
-from app.service.indexing_service import IndexingService
-from app.service.pdf_processing_service import PDFProcessingService
-from app.dto.chunk_dto import ChunkDTO
-from app.service.json_processing_service import JsonProcessingService
+from app.backend.service.text_processing_service import TextProcessingService
+from app.backend.service.image_processing_service import ImageProcessingService
+from app.backend.service.video_processing_service import VideoProcessingService
+from app.backend.service.ai_service import AIService
+from app.backend.service.file_service import FileService
+from app.backend.service.indexing_service import IndexingService
+from app.backend.service.pdf_processing_service import PDFProcessingService
+from app.backend.dto.chunk_dto import ChunkDTO
+from app.backend.service.json_processing_service import JsonProcessingService
 
 
 processing_data_router = APIRouter(prefix="/data-processing", tags=["process-data"])

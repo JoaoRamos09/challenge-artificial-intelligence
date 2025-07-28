@@ -1,7 +1,7 @@
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
-from app.exception.ai_exception import InvalidProviderError, InvokeModelError
+from app.backend.exception.ai_exception import InvalidProviderError, InvokeModelError
 
 default_model = "meta-llama/llama-4-maverick-17b-128e-instruct"
 default_provider = "groq"

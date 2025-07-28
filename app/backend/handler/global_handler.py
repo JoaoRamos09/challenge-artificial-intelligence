@@ -1,6 +1,6 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from app.exception.base_exception import BaseException
+from app.backend.exception.base_exception import BaseException
 from pydantic import ValidationError
 
 async def global_exception_handler(request: Request, exc: BaseException):

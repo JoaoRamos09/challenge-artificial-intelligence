@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
     
 class ChunkDTO(BaseModel):
     id: str
