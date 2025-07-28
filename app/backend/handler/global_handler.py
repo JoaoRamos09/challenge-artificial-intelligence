@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from app.backend.exception.base_exception import BaseException
 from pydantic import ValidationError
 
+
 async def global_exception_handler(request: Request, exc: BaseException):
     return JSONResponse(
         status_code=exc.status_code, 
