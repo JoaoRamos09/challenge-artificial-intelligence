@@ -23,10 +23,10 @@ class ConversationService():
     def save_conversation(self, conversation: ConversationSchema) -> ConversationSchema:
         return self.conversation_repository.create_conversation(conversation)
     
-    def start_conversation(self, conversation: ConversationSchema) -> ConversationSchema:
-        if self.existis_ongoing_conversation(conversation.user_id):
-            raise ConversationNotStartedError()
-        return self.save_conversation(conversation)
+    def start_conversation(self, user_id: int) -> ConversationSchema:
+        if self.existis_ongoing_conversation(user_id):
+            raise ConversationNotStartedError(user_id)
+        return self.save_conversation(ConversationSchema(user_id=user_id, status=StatusConversationEnum.ONGOING))
     
     def validate_finished_conversation(self, conversation_id: int):
         conversation = self.get_conversation_by_id(conversation_id)
