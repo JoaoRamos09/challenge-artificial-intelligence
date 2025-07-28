@@ -10,3 +10,5 @@ python-dotenv
 pydantic
 psycopg2-binary
 streamlit
+langgraph
+langsmith

@@ -2,7 +2,7 @@ from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from app.backend.exception.ai_exception import InvalidProviderError, InvokeModelError
-
+import logging
 default_model = "meta-llama/llama-4-maverick-17b-128e-instruct"
 default_provider = "groq"
 
@@ -17,6 +17,7 @@ class AIService():
             except(InvalidProviderError) as e:
                 raise e
             except Exception as e:
+                logging.error(f"Error invoking LLM: {e}")
                 raise InvokeModelError(model, provider)
     
     def get_llm(self,provider:str, output_structured, model:str):
@@ -44,6 +45,7 @@ class AIService():
             )
             return transcription
         except Exception as e:
+            
             raise InvokeModelError("whisper", "openai")
     
     

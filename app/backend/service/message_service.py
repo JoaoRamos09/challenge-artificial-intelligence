@@ -14,6 +14,9 @@ class MessageService():
     def save_messages(self, messages: list[MessageSchema]) -> list[MessageSchema]:
         return self.message_repository.create_messages(messages)
     
+    def delete_messages_by_conversation_id(self, conversation_id: int) -> list[MessageSchema]:
+        return self.message_repository.delete_messages_by_conversation_id(conversation_id)
+    
     def get_messages_by_conversation_id(self, conversation_id: int) -> list[MessageSchema]:
         messages = self.message_repository.get_messages_by_conversation_id(conversation_id)
         if not messages:

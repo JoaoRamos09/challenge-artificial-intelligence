@@ -1,5 +1,6 @@
 from pydantic import BaseModel
+from app.backend.dto.message_dto import MessageDTO
 
 class ChatStartResponseDTO(BaseModel):
-    response: str
+    messages: list[MessageDTO]
     conversation_id: int
