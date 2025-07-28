@@ -8,3 +8,4 @@ PyPDF2
 sqlalchemy
 python-dotenv
 pydantic
+psycopg2-binary
