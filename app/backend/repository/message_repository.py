@@ -12,7 +12,12 @@ class MessageRepository():
         self.db.add_all(messages)
         self.db.commit()
         return messages
+    
+    def delete_messages_by_conversation_id(self, conversation_id: int) -> None:
+        self.db.query(MessageSchema).filter(MessageSchema.conversation_id == conversation_id).delete()
+        self.db.commit()
 
     def get_messages_by_conversation_id(self, conversation_id: int) -> list[MessageSchema]:
         return self.db.query(MessageSchema).filter(MessageSchema.conversation_id == conversation_id).all()
     
+ 
