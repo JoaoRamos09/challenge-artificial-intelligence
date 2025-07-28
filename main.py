@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from app import create_app
 import uvicorn
-from app.config.postgres_config import create_tables
+from app.backend.config.postgres_config import create_tables
 
 load_dotenv()
 

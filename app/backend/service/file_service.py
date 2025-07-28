@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-from app.exception.file_exception import FileNotFound, InvalidTypeFileError, InvalidSuffixFileError, FileException
+from app.backend.exception.file_exception import FileNotFound, InvalidTypeFileError, InvalidSuffixFileError, FileException
 import base64
 import json
+
 class FileService():
     def __init__(self):
         pass

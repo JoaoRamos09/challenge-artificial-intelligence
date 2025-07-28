@@ -1,12 +1,12 @@
 from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from app.dto.chunk_dto import ChunkDTO
-from app.service.ai_service import AIService
+from app.backend.dto.chunk_dto import ChunkDTO
+from app.backend.service.ai_service import AIService
 from langchain_core.messages import HumanMessage, SystemMessage
-from app.dto.text_analysis_dto import TextAnalisysDTO
-from app.service.file_service import FileService
+from app.backend.dto.text_analysis_dto import TextAnalisysDTO
+from app.backend.service.file_service import FileService
 import uuid
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
 class TextProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service

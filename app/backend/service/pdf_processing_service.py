@@ -1,13 +1,13 @@
 from PyPDF2 import PdfReader
 from PyPDF2._page import PageObject
-from app.service.file_service import FileService
-from app.service.ai_service import AIService
-from app.service.text_processing_service import TextProcessingService
-from app.dto.chunk_dto import ChunkDTO
+from app.backend.service.file_service import FileService
+from app.backend.service.ai_service import AIService
+from app.backend.service.text_processing_service import TextProcessingService
+from app.backend.dto.chunk_dto import ChunkDTO
 from langchain_core.messages import SystemMessage, HumanMessage
-from app.dto.pdf_analysis_dto import PDFAnalysisDTO
+from app.backend.dto.pdf_analysis_dto import PDFAnalysisDTO
 import uuid
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
 
 class PDFProcessingService:
     def __init__(self, file_service: FileService, text_processing_service: TextProcessingService, ai_service: AIService):

@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, DateTime, Text, Enum
 from datetime import datetime
-from app.enum.type_content_enum import TypeContentEnum
-from app.enum.nivel_techinical_enum import NivelTechinicalEnum
-from app.database.base import Base
+from app.backend.enum.type_content_enum import TypeContentEnum
+from app.backend.enum.nivel_techinical_enum import NivelTechinicalEnum
+from app.backend.database.base import Base
 
 class PreferenceSchema(Base):
     __tablename__ = "preferences"

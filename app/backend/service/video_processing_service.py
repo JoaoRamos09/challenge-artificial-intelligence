@@ -1,13 +1,13 @@
-from app.service.ai_service import AIService
+from app.backend.service.ai_service import AIService
 from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
-from app.dto.video_analysis_dto import VideoAnalysisDTO
-from app.dto.chunk_dto import ChunkDTO
-from app.service.text_processing_service import TextProcessingService
-from app.service.file_service import FileService
+from app.backend.dto.video_analysis_dto import VideoAnalysisDTO
+from app.backend.dto.chunk_dto import ChunkDTO
+from app.backend.service.text_processing_service import TextProcessingService
+from app.backend.service.file_service import FileService
 from typing import List
 import uuid
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
 
 class VideoProcessingService():
     def __init__(self, ai_service: AIService, text_processing_service: TextProcessingService, file_service: FileService):

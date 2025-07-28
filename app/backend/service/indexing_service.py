@@ -1,10 +1,9 @@
 
 from pinecone import Pinecone
-from app.dto.chunk_dto import ChunkDTO
+from app.backend.dto.chunk_dto import ChunkDTO
 import os
-import json
-from app.exception.pinecone_exception import PineconeUpsertError
-from app.database.pinecone import get_index
+from app.backend.exception.pinecone_exception import PineconeUpsertError
+from app.backend.database.pinecone import get_index
 
 class IndexingService:
     def __init__(self):

@@ -1,11 +1,12 @@
-from app.service.file_service import FileService
-from app.dto.chunk_dto import ChunkDTO
-from app.service.ai_service import AIService
+from app.backend.service.file_service import FileService
+from app.backend.dto.chunk_dto import ChunkDTO
+from app.backend.service.ai_service import AIService
 import re
 from langchain_core.messages import SystemMessage, HumanMessage
-from app.dto.json_analysis_dto import JSONAnalysisDTO
+from app.backend.dto.json_analysis_dto import JSONAnalysisDTO
 import uuid
-from app.enum.type_file_enum import TypeFileEnum
+from app.backend.enum.type_file_enum import TypeFileEnum
+
 class JsonProcessingService:
     def __init__(self, file_service: FileService, ai_service: AIService):
         self.file_service = file_service

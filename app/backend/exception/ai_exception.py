@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import status
-from app.exception.base_exception import BaseException
+from app.backend.exception.base_exception import BaseException
 
 class AIException(BaseException):
     
