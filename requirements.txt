@@ -5,10 +5,10 @@ langchain_core
 langchain_groq
 openai
 PyPDF2
-sqlalchemy
 python-dotenv
 pydantic
-psycopg2-binary
 streamlit
 langgraph
 langsmith
+langgraph-checkpoint-postgres
+psycopg[binary,pool]
