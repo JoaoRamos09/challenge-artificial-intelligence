@@ -1,81 +1,49 @@
 import streamlit as st
 import requests
-from datetime import datetime
 
 st.set_page_config(page_title="Chat AI", page_icon="💬")
 
 st.title("💬 Chat AI")
 
-if 'conversation_id' not in st.session_state:
-    st.session_state.conversation_id = None
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
 user_id = st.number_input("ID do Usuário", min_value=1, step=1, value=st.session_state.get('user_id', 99))
 st.session_state.user_id = user_id
 
-
+for message in st.session_state.messages:
+    role = "assistant" if message["type_message"].lower() == "ai" else "user"
+    with st.chat_message(role):
+        st.write(message["content"])
 if prompt := st.chat_input("Digite sua mensagem..."):
     try:
-        if st.session_state.conversation_id is None:
-        
-            response = requests.post(
-                "http://localhost:8000/chat/start",
-                json={
-                    "input_user": prompt,
-                    "user_id": int(st.session_state.user_id)
-                },
-                timeout=30
-            )
-            if response.status_code == 201:
-                data = response.json()
-                st.session_state.conversation_id = data["conversation_id"]
+        response = requests.post(
+            "http://localhost:8000/chat/ongoing",
+            json={
+                "input_user": prompt,
+                "user_id": int(st.session_state.user_id)
+            },
+            timeout=30
+        )
+        if response.status_code == 201:
+            data = response.json()
+            st.session_state.messages.append({
+                "type_message": "user",
+                "content": prompt
+            })
+            if "messages" in data and data["messages"]:
+                last_message = data["messages"]
             
-                for message in data["messages"]:
-                    role = "assistant" if message["type_message"] == "ai" else "user"
+                for message in st.session_state.messages:
+                    role = "assistant" if message["type_message"].lower() == "ai" else "user"
                     with st.chat_message(role):
-                        if message["type_message"] == "ai":
-                            st.write( message["content"])
-                        else:
                             st.write(message["content"])
-            else:
-                st.error("Erro ao iniciar conversa. Tente novamente.")
         else:
-        
-            response = requests.post(
-                "http://localhost:8000/chat/ongoing",
-                json={
-                    "input_user": prompt,
-                    "conversation_id": st.session_state.conversation_id
-                },
-                timeout=30
-            )
-            if response.status_code == 201:
-                data = response.json()
-
-                for message in data["messages"]:
-                    role = "assistant" if message["type_message"] == "AI" else "user"
-                    with st.chat_message(role):
-                        if message["type_message"] == "AI":
-                            st.write("🤖 " + message["content"])
-                        else:
-                            st.write(message["content"])
-            else:
-                st.error("Erro na API. Tente novamente.")
+            st.error("Erro na API. Tente novamente.")
     except Exception as e:
         st.error(f"Erro de conexão: {str(e)}")
 
-if st.button("Finalizar Conversa") and st.session_state.conversation_id:
-    try:
-        response = requests.post(
-            "http://localhost:8000/chat/finished",
-            params={"conversation_id": st.session_state.conversation_id},
-            timeout=10
-        )
-        if response.status_code == 204:
-            st.success("Conversa finalizada com sucesso!")
-            st.session_state.messages = []
-            st.session_state.conversation_id = None
-            st.rerun()
-        else:
-            st.error("Erro ao finalizar conversa.")
-    except Exception as e:
-        st.error(f"Erro ao finalizar conversa: {str(e)}")
+if st.button("Finalizar Conversa"):
+    st.session_state.messages = []
+    st.success("Conversa finalizada com sucesso!")
+    st.rerun()
