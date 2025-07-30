@@ -97,3 +97,7 @@ Para utilizar este projeto de inteligência artificial, siga os passos abaixo:
 
 7. **Atenção às Configurações**  
    - Preste atenção nas variáveis de ambiente e demais configurações solicitadas para garantir o funcionamento correto do sistema.
+
+8. **Observabilidade**
+   - Foi criada uma conta do Google exclusiva para este desafio, permitindo o acesso tanto ao Pinecone quanto ao Langsmith. As credenciais e permissões necessárias já estão 
+     configuradas para facilitar o uso dessas ferramentas durante o desenvolvimento e testes.
