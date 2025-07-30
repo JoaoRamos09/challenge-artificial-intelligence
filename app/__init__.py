@@ -5,6 +5,7 @@ from app.backend.controller.chat_controller import chat_router
 import coloredlogs
 import sys
 from app.backend.config.middlware_config import request_middleware
+from app.backend.controller.chat_ai_controller import chat_router
 
 coloredlogs.install(level='INFO', fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', stream=sys.stdout, level_styles={
         'info': {'color': 'green'},
