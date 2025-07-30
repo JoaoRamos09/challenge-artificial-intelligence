@@ -20,6 +20,7 @@ def get_chat_ai_service(ai_service: Annotated[AIService, Depends(get_ai_service)
 def get_message_mapper():
     return MessageMapper()
 
+AIServiceDep = Annotated[AIService, Depends(get_ai_service)]
 ChatAIServiceDep = Annotated[ChatAIService, Depends(get_chat_ai_service)]
 MessageMapperDep = Annotated[MessageMapper, Depends(get_message_mapper)]
 
@@ -39,3 +40,9 @@ def ongoing_chat(chat_ongoing_input_dto: ChatOngoingInputDTO, chat_ai_service: C
         message=message_dto[-1],
         user_id=chat_ongoing_input_dto.user_id
     )
+
+@chat_router.post("/vision", status_code=201)
+def vision_chat(prompt:str, ai_service: AIServiceDep):
+    image_path = ai_service.invoke_model_vision(prompt, "123")
+    return image_path
+
