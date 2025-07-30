@@ -95,7 +95,6 @@ class ChatAIService():
     
     def get_information_user_node(self, state: ChatAIState) -> ChatAIState:
         user_messages = '\n'.join([f"{message.content}" for message in state["messages_user"]])
-        print(user_messages)
         extract_data_messages = [
             SystemMessage(content=(
                 f"""
@@ -158,25 +157,22 @@ class ChatAIService():
         )
         
         state["preferences_user"] = get_information_answer_ai
-        print(state["preferences_user"])
+
         
         if get_information_answer_ai.level_technical is None:
-            print("Nível técnico não informado")
+
             state["sufficient_information"] = False
             return state
         
         if get_information_answer_ai.description is None:
-            print("Descrição não informada")
             state["sufficient_information"] = False
             return state
         
         if get_information_answer_ai.weaknesses is None:
-            print("Pontos fracos não informados")
             state["sufficient_information"] = False
             return state
         
         if get_information_answer_ai.type_content is None:
-            print("Tipo de conteúdo não informado")
             state["sufficient_information"] = False
             return state
         

@@ -1,5 +1,3 @@
-
-from pinecone import Pinecone
 from app.backend.dto.chunk_dto import ChunkDTO
 import os
 from app.backend.exception.pinecone_exception import PineconeUpsertError, PineconeRetrieveError
