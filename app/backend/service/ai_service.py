@@ -3,6 +3,9 @@ from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from app.backend.exception.ai_exception import InvalidProviderError, InvokeModelError
 import logging
+import base64
+import os
+
 default_model = "meta-llama/llama-4-maverick-17b-128e-instruct"
 default_provider = "groq"
 
@@ -48,5 +51,28 @@ class AIService():
         except Exception as e:
             
             raise InvokeModelError("whisper", "openai")
+    
+    def invoke_model_vision(self, prompt_user, user_id):
+        logging.info(f"[INVOKE MODEL VISION] Invoking the model vision, user_id: {user_id}")
+        try:
+            client = OpenAI()      
+            result = client.images.generate(
+                model="gpt-image-1",
+                prompt=prompt_user,
+                size="1024x1024",
+                quality="medium"
+            )
+
+            image_base64 = result.data[0].b64_json
+            image_bytes = base64.b64decode(image_base64)
+
+            file_name = f"{user_id}.png"
+            with open(file_name, "wb") as f:
+                f.write(image_bytes)
+            full_path = os.path.abspath(file_name)
+            return full_path
+        
+        except Exception as e:
+            raise InvokeModelError("vision", str(e))
     
     
