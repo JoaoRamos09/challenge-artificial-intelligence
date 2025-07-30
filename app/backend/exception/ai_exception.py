@@ -1,8 +1,8 @@
 from typing import Optional
 from fastapi import status
-from app.backend.exception.base_exception import BaseException
+from app.backend.exception.base_api_exception import BaseAPIException
 
-class AIException(BaseException):
+class AIException(BaseAPIException):
     
     def __init__(self, 
                  message: str,  

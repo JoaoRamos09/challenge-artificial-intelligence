@@ -1,8 +1,8 @@
-from app.backend.exception.base_exception import BaseException
+from app.backend.exception.base_api_exception import BaseAPIException
 from typing import Optional
 from fastapi import status
 
-class PineconeException(BaseException):
+class PineconeException(BaseAPIException):
     
     def __init__(self, 
                  message: str, 

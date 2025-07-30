@@ -1,9 +1,9 @@
 from typing import Optional, Dict, Any
 from fastapi import status
-from app.backend.exception.base_exception import BaseException
+from app.backend.exception.base_api_exception import BaseAPIException
 
 
-class FileException(BaseException):
+class FileException(BaseAPIException):
     
     def __init__(self, 
                  message: str, 
