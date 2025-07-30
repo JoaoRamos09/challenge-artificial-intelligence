@@ -306,6 +306,8 @@ class ChatAIService():
     def graph_chat_ai(self,):
         conn = Connection.connect(DB_URL, **connection_kwargs)
         checkpointer = PostgresSaver(conn)
+        # Necessary to run only the first time
+        checkpointer.setup()
         graph = StateGraph(ChatAIState)
         
         graph.add_node("safety_input_user_node", self.safety_input_user_node)

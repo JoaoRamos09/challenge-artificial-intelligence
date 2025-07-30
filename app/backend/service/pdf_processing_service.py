@@ -15,7 +15,6 @@ class PDFProcessingService:
         self.text_processing_service = text_processing_service
         self.ai_service = ai_service
 
-    ##TODO: Add custom exception
     def process_pdf(self, path: str):
         file_path = self.file_service.get_pdf_from_path(path)
         pdf = self.read_pdf(file_path)

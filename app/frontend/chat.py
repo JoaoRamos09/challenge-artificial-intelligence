@@ -4,17 +4,13 @@ import requests
 st.set_page_config(page_title="Chat AI", page_icon="💬")
 st.title("💬 Chat AI")
 
-# Inicializar mensagens
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
-# ID do usuário
 user_id = st.number_input("ID do Usuário", min_value=1, value=99)
 
-# Chat input
 prompt = st.chat_input("Digite sua mensagem...")
 
-# Mostrar mensagens existentes (deve ser feito ANTES do input para garantir atualização correta)
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
@@ -51,7 +47,6 @@ if prompt:
     except Exception as e:
         st.error(f"Erro: {str(e)}")
 
-# Botão para limpar
 if st.button("Limpar Conversa"):
     st.session_state.messages = []
     st.rerun()

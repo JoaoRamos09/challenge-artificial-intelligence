@@ -7,6 +7,7 @@ from app.backend.dto.text_analysis_dto import TextAnalisysDTO
 from app.backend.service.file_service import FileService
 import uuid
 from app.backend.enum.type_file_enum import TypeFileEnum
+
 class TextProcessingService:
     def __init__(self, ai_service: AIService, file_service: FileService):
         self.ai_service = ai_service
