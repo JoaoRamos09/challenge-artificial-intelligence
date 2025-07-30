@@ -11,14 +11,14 @@ class AIService():
         pass
     
     def invoke_llm(self,messages,provider:str = default_provider, model:str = default_model,output_structured=None):
-            try:
-                result = self.get_llm(provider,output_structured, model).invoke(input=messages)
-                return result
-            except(InvalidProviderError) as e:
-                raise e
-            except Exception as e:
-                logging.error(f"Error invoking LLM: {e}")
-                raise InvokeModelError(model, provider)
+        logging.info(f"[INVOKE LLM] - {provider}:{model} ")
+        try:
+            result = self.get_llm(provider,output_structured, model).invoke(input=messages)
+            return result
+        except(InvalidProviderError) as e:
+            raise e
+        except Exception as e:
+            raise InvokeModelError(model, provider)
     
     def get_llm(self,provider:str, output_structured, model:str):
         
@@ -36,6 +36,7 @@ class AIService():
             return ChatGroq(model=model) 
        
     def invoke_whisper(self,path_file):
+        logging.info(f"[INVOKE WHISPER] - {path_file}")
         try:
             client = OpenAI()
             transcription = client.audio.transcriptions.create(

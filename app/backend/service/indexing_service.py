@@ -4,7 +4,7 @@ from app.backend.dto.chunk_dto import ChunkDTO
 import os
 from app.backend.exception.pinecone_exception import PineconeUpsertError
 from app.backend.database.pinecone import get_index
-
+import logging
 class IndexingService:
     def __init__(self):
         self.index = get_index()
@@ -12,6 +12,7 @@ class IndexingService:
         self.namespace = os.environ.get("PINECONE_NAMESPACE")
 
     def save_data(self, chunks:list[ChunkDTO]):
+        logging.info(f"[INDEXING SERVICE] Save data in: {self.namespace}")
         formatted_data = [self.format_data_dict(chunk) for chunk in chunks]
         try:
             self.index.upsert_records(self.namespace,formatted_data)

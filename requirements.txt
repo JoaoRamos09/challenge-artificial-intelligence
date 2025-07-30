@@ -10,5 +10,7 @@ pydantic
 streamlit
 langgraph
 langsmith
+coloredlogs
 langgraph-checkpoint-postgres
 psycopg[binary,pool]
+coloredlogs
