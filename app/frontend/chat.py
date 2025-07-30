@@ -2,48 +2,56 @@ import streamlit as st
 import requests
 
 st.set_page_config(page_title="Chat AI", page_icon="💬")
-
 st.title("💬 Chat AI")
 
+# Inicializar mensagens
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
-user_id = st.number_input("ID do Usuário", min_value=1, step=1, value=st.session_state.get('user_id', 99))
-st.session_state.user_id = user_id
+# ID do usuário
+user_id = st.number_input("ID do Usuário", min_value=1, value=99)
 
+# Chat input
+prompt = st.chat_input("Digite sua mensagem...")
+
+# Mostrar mensagens existentes (deve ser feito ANTES do input para garantir atualização correta)
 for message in st.session_state.messages:
-    role = "assistant" if message["type_message"].lower() == "ai" else "user"
-    with st.chat_message(role):
+    with st.chat_message(message["role"]):
         st.write(message["content"])
-if prompt := st.chat_input("Digite sua mensagem..."):
+
+if prompt:
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+
+    with st.chat_message("user"):
+        st.write(prompt)
+    
+ 
     try:
         response = requests.post(
-            "http://localhost:8000/chat/ongoing",
-            json={
-                "input_user": prompt,
-                "user_id": int(st.session_state.user_id)
-            },
-            timeout=30
+            "http://localhost:8000/chat-ai/ongoing",
+            json={"input_user": prompt, "user_id": user_id}
         )
+        
         if response.status_code == 201:
             data = response.json()
-            st.session_state.messages.append({
-                "type_message": "user",
-                "content": prompt
-            })
-            if "messages" in data and data["messages"]:
-                last_message = data["messages"]
             
-                for message in st.session_state.messages:
-                    role = "assistant" if message["type_message"].lower() == "ai" else "user"
-                    with st.chat_message(role):
-                            st.write(message["content"])
+        
+            if data.get("answer_ai"):
+                st.session_state.messages.append({
+                    "role": "assistant", 
+                    "content": data["answer_ai"]
+                })
+        
+                with st.chat_message("assistant"):
+                    st.write(data["answer_ai"])
         else:
-            st.error("Erro na API. Tente novamente.")
+            st.error("Erro na API")
+            
     except Exception as e:
-        st.error(f"Erro de conexão: {str(e)}")
+        st.error(f"Erro: {str(e)}")
 
-if st.button("Finalizar Conversa"):
+# Botão para limpar
+if st.button("Limpar Conversa"):
     st.session_state.messages = []
-    st.success("Conversa finalizada com sucesso!")
     st.rerun()

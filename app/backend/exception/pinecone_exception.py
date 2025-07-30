@@ -38,3 +38,12 @@ class PineconeUpsertError(PineconeException):
             index=index,
             error_code="PINECONE_UPSERT_ERROR",
         )
+
+class PineconeRetrieveError(PineconeException):
+    def __init__(self, namespace: str, index: str):
+        super().__init__(
+            message=f"Error retrieving data from Pinecone",
+            namespace=namespace,
+            index=index,
+            error_code="PINECONE_RETRIEVE_ERROR",
+        )

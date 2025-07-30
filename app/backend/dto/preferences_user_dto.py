@@ -1,9 +1,25 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Optional
 
 class PreferencesUserDTO(BaseModel):
-    level_technical: str = Field(..., description="Nível técnico do usuário, junior, mid, senior")
-    preference_content: Literal["text", "video", "image"] = Field(..., description="Preferência de conteúdo do usuário, text, video, image")
-    description: str = Field(..., description="Uma descrição detalhada do usuário, sua experiência, habilidades e interesses")
-    weaknesses: str = Field(..., description="Os pontos técnicos que o usuário acha mais difíceis ou que precisa melhorar")
-    strengths: str = Field(..., description="Os pontos que o usuário se orgulha e que acredita que são seus pontos fortes")
+    level_technical: Optional[str] = Field(
+        default=None,
+        description="Nível técnico do usuário, por exemplo: júnior, pleno, sênior"
+    )
+    
+    description: Optional[str] = Field(
+        default=None,
+        description="Descrição do perfil do usuário"
+    )
+    
+    weaknesses: Optional[str] = Field(
+        default=None,
+        description="Pontos fracos do usuário"
+    )
+    
+    type_content: Optional[str] = Field(
+        default=None,
+        description="Qual é a maneira que o usuário gosta de estudar? Por vídeo? texto, audio?",
+        examples=["texto", "video", "audio"],
+        pattern="^(texto|video|audio)?$"
+    )
