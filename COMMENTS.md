@@ -73,9 +73,7 @@ Para utilizar este projeto de inteligência artificial, siga os passos abaixo:
 
 3. **Inicialização do Backend**  
    - Execute o arquivo `main.py` e inicie o servidor FastAPI com:
-     ```
-     uvicorn main:app --reload
-     ```
+   
    - O backend ficará disponível em `http://localhost:8000`.
 
 4. **Inicialização do Frontend**  
