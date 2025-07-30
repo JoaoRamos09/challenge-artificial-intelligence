@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from app.backend.dto.message_dto import MessageDTO
-
+from app.backend.dto.preferences_user_dto import PreferencesUserDTO
+from typing import Optional
 class ChatOngoingResponseDTO(BaseModel):
-    message: MessageDTO
-    user_id: int
+    
+    answer_ai: str
+    preferences_user: Optional[PreferencesUserDTO]
