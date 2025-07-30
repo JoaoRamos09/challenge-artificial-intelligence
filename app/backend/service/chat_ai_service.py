@@ -3,9 +3,21 @@ from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
 from app.backend.state.chat_ai_state import ChatAIState
 from app.backend.service.ai_service import AIService
 from langgraph.graph import StateGraph, END
-from app.backend.dto.extract_data_dto import ExtractDataDTO
-from app.backend.dto.preferences_dto import PreferenceDTO
-from typing import Optional
+from app.backend.dto.preferences_user_dto import PreferencesUserDTO
+from langgraph.checkpoint.postgres import PostgresSaver
+import os
+from dotenv import load_dotenv
+from psycopg import Connection
+
+load_dotenv()
+
+DB_URL = str(os.getenv('DATABASE_URL')+"?sslmode=disable")
+
+connection_kwargs = {
+    "autocommit": True,
+    "prepare_threshold": 0,
+}
+
 class ChatAIService():
     def __init__(self, ai_service:AIService):
         self.ai_service = ai_service
@@ -73,7 +85,7 @@ class ChatAIService():
     
     def extract_prefereces_user(self, state: ChatAIState) -> ChatAIState:
         
-        if state["extract_data"]:
+        if state.get("extract_data"):
             return state
         
         system_message = SystemMessage(content="""
@@ -85,7 +97,6 @@ class ChatAIService():
                           - Descrição do perfil do usuário (ex: programador, estudante, profissional de TI);
                           - Pontos fortes técnicos do usuário.
                           - Pontos fracos técnicos do usuário.
-                          - O assunto que o usuário está tentando resolver ou dúvida que ele está tentando resolver, ou o tema que ele está tentando aprender. Pergunte a ele caso não esteja claro.
 
                           **Instruções Importantes:**
                           - Você não deve responder a solicitação/pergunta do usuário;
@@ -122,8 +133,8 @@ class ChatAIService():
                           - Não responda ao usuário nem explique sua análise; sua única função é avaliar a suficiência das informações.
 
                           **Responda apenas com uma das opções abaixo, sem adicionar comentários ou explicações:**
-                          - Se faltar qualquer uma das informações acima, responda exatamente: "insufficient_information"
-                          - Se todas as informações estiverem presentes e claras, responda exatamente: "sufficient_information"
+                          - Se faltar qualquer uma das informações acima, responda exatamente: "not_ok"
+                          - Se todas as informações estiverem presentes e claras, responda exatamente: "ok"
 
                           Seja objetivo, preciso e siga rigorosamente as instruções acima.
                           
@@ -133,7 +144,7 @@ class ChatAIService():
         response = self.ai_service.invoke_llm(messages_analyze_insufficent_information, model="gpt-4o-mini",provider="openai")
         answer = response.content
         
-        if answer.lower() == "insufficient_information":
+        if answer.lower() == "not_ok":
             state["insufficent_information"] = True
             return state
         
@@ -146,21 +157,19 @@ class ChatAIService():
                   - Descrição do Usuário: Descrição do usuário, se ele é um programador, um estudante, um profissional de TI, etc. Como ele interage, quais tipos de perguntas ele faz, etc.
                   - Quais são so seus pontos fortes técnicos;
                   - Quais são so seus pontos fracos técnicos;
-                  - Qual a pergunta do usuário ou dúvida que ele está tentando resolver;
                   
                   IMPORTANTE: Use os valores exatos dos enums (JUNIOR, MID_LEVEL, SENIOR para level_technical e TEXT, VIDEO, IMAGE para preference_content)
                   """),
             *state["messages"]
         ]
-        response = self.ai_service.invoke_llm(messages_preferences_user, model="gpt-4o-mini",provider="openai", output_structured=ExtractDataDTO)
-        extract_data = ExtractDataDTO(**response.model_dump())
-        state["extract_data"] = extract_data
+        response = self.ai_service.invoke_llm(messages_preferences_user, model="gpt-4o-mini",provider="openai", output_structured=PreferencesUserDTO)
+        preferences_user = PreferencesUserDTO(**response.model_dump())
+        state["preferences_user"] = preferences_user
         state["insufficent_information"] = False
         return state
+
     
     def generate_answer_node(self, state: ChatAIState) -> ChatAIState:
-        
-        state["messages"].pop()
         
         messages_question_user = [
             SystemMessage(content="""
@@ -186,6 +195,7 @@ class ChatAIService():
         ]
         response_question_user = self.ai_service.invoke_llm(messages_question_user, model="gpt-4o-mini",provider="openai")
         question_user = response_question_user.content
+        state["question"] = question_user
          
         messages = [
             SystemMessage(content="""
@@ -211,16 +221,15 @@ class ChatAIService():
                           """),
             HumanMessage(content=
                          f"""
-                         Me ajude a responder a seguinte pergunta: {question_user}
-                         O tema que eu quero aprender é: {state["extract_data"].question}
+                         Me ajude a responder a seguinte pergunta: {state["question"]}
                          
                          Leve em consideração as minhas preferências:
                          
-                         Nível Técnico: {state["extract_data"].level_technical}
-                         Formato de Conteúdo: {state["extract_data"].preference_content}
-                         Descrição do Usuário: {state["extract_data"].description}
-                         Pontos Fortes: {state["extract_data"].strengths}
-                         Pontos Fracos: {state["extract_data"].weaknesses}
+                         Nível Técnico: {state["preferences_user"].level_technical}
+                         Formato de Conteúdo: {state["preferences_user"].preference_content}
+                         Descrição do Usuário: {state["preferences_user"].description}
+                         Pontos Fortes: {state["preferences_user"].strengths}
+                         Pontos Fracos: {state["preferences_user"].weaknesses}
                          
                          """),
         ]
@@ -229,6 +238,8 @@ class ChatAIService():
         return state
     
     def graph_chat_ai(self,):
+        conn = Connection.connect(DB_URL, **connection_kwargs)
+        checkpointer = PostgresSaver(conn)
         graph = StateGraph(ChatAIState)
         graph.add_node("safety_input_user_node", self.safety_input_user_node)
         graph.add_node("generate_generic_answer_node", self.generate_generic_answer_node)
@@ -241,23 +252,15 @@ class ChatAIService():
         graph.add_edge("extract_prefereces_user", "analyze_insufficent_information")
         graph.add_conditional_edges("analyze_insufficent_information", lambda x: x["insufficent_information"], {False: "generate_answer_node",True: END})
         graph.add_edge("generate_answer_node", END)
-        return graph.compile()
+        return graph.compile(checkpointer=checkpointer)
     
-    def invoke_graph_chat_ai(self, messages: list[BaseMessage], preferences_user: Optional[PreferenceDTO] = None):
+    def invoke_graph_chat_ai(self,user_id: int, messages: list[BaseMessage]):
         graph = self.graph_chat_ai()
         try:
-            if preferences_user:
-                extract_data = ExtractDataDTO(
-                    level_technical=preferences_user.level_technical,
-                    preference_content=preferences_user.preference_content,
-                    description=preferences_user.description,
-                    weaknesses=preferences_user.weaknesses,
-                    strengths=preferences_user.strengths,
-                )
-                response = graph.invoke({"messages": messages, "extract_data": extract_data})
-            else:
-                response = graph.invoke({"messages": messages, "extract_data": None})
+            config = {"configurable": {"thread_id": str(user_id)}}
+            response = graph.invoke({"messages": messages}, config=config)
             return response
+        
         except Exception as e:
             raise e
         
