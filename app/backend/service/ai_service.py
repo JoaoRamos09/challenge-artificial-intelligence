@@ -1,11 +1,11 @@
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
+import openai
 from app.backend.exception.ai_exception import InvalidProviderError, InvokeModelError
 import logging
-import base64
-import os
-
+import time
+from pathlib import Path
 default_model = "meta-llama/llama-4-maverick-17b-128e-instruct"
 default_provider = "groq"
 
@@ -26,17 +26,17 @@ class AIService():
     def get_llm(self,provider:str, output_structured, model:str):
         
         if provider not in ["openai", "groq"]:
-            raise InvalidProviderError(model, provider)
+            raise InvalidProviderError(model, provider, )
 
         if provider == "openai":
             if output_structured:
-                return ChatOpenAI(model=model).with_structured_output(output_structured)
-            return ChatOpenAI(model=model)
+                return ChatOpenAI(model=model, temperature=0.1).with_structured_output(output_structured)
+            return ChatOpenAI(model=model, temperature=0.1)
         
         elif provider == "groq":
             if output_structured:
-                return ChatGroq(model=model).with_structured_output(output_structured)
-            return ChatGroq(model=model) 
+                return ChatGroq(model=model, temperature=0.1).with_structured_output(output_structured)
+            return ChatGroq(model=model, temperature=0.1) 
        
     def invoke_whisper(self,path_file):
         logging.info(f"[INVOKE WHISPER] - {path_file}")
@@ -52,27 +52,34 @@ class AIService():
             
             raise InvokeModelError("whisper", "openai")
     
-    def invoke_model_vision(self, prompt_user, user_id):
-        logging.info(f"[INVOKE MODEL VISION] Invoking the model vision, user_id: {user_id}")
+    def invoke_text_to_speech(self, text, filename: str = None):
+        logging.info(f"[INVOKE TEXT TO SPEECH] - {text[:15]}...")
         try:
-            client = OpenAI()      
-            result = client.images.generate(
-                model="gpt-image-1",
-                prompt=prompt_user,
-                size="1024x1024",
-                quality="medium"
-            )
-
-            image_base64 = result.data[0].b64_json
-            image_bytes = base64.b64decode(image_base64)
-
-            file_name = f"{user_id}.png"
-            with open(file_name, "wb") as f:
-                f.write(image_bytes)
-            full_path = os.path.abspath(file_name)
-            return full_path
+            client = OpenAI()
         
+            audio_dir = Path("generated_audio")
+            audio_dir.mkdir(exist_ok=True)
+            
+            if not filename:
+                filename = f"speech_{int(time.time())}.mp3"
+            
+            speech_file_path = audio_dir / filename
+            
+            with client.audio.speech.with_streaming_response.create(
+                model="gpt-4o-mini-tts", 
+                voice="alloy",
+                input=text,
+                response_format="mp3"
+            ) as response:
+                response.stream_to_file(speech_file_path)
+            
+            full_path = speech_file_path.absolute()
+            logging.info(f"[INVOKING TEXT TO SPEECH] - Audio saved at: {full_path.name}")
+            return str(full_path)
+            
         except Exception as e:
-            raise InvokeModelError("vision", str(e))
+            logging.error(f"[INVOKE TEXT TO SPEECH ERROR] - {str(e)}")
+            raise InvokeModelError("gpt-4o-mini-tts", "openai")
+    
     
     
